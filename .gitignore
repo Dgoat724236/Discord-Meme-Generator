@@ -105,3 +105,6 @@ dist
 
 # Secret config file
 config.js
+
+# Remove Visual Studio folder
+.vs/
