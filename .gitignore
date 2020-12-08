@@ -108,3 +108,6 @@ config.js
 
 # Remove Visual Studio folder
 .vs/
+
+# Remove images from image folder
+images/*

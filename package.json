@@ -23,6 +23,11 @@
   },
   "homepage": "https://github.com/Dgoat724236/Discord-Meme-Generator#readme",
   "dependencies": {
-    "discord.js": "^12.5.1"
+    "canvas": "^2.6.1",
+    "discord.js": "^12.5.1",
+    "file-type": "^16.0.1",
+    "image-size": "^0.9.3",
+    "reaction-core": "^2.3.0",
+    "request": "^2.88.2"
   }
 }

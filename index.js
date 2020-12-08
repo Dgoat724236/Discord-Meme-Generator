@@ -1,5 +1,7 @@
 const Discord = require('discord.js');
 const fs = require('fs');
+const RC = require('reaction-core')
+const handler = new RC.Handler()
 
 const client = new Discord.Client();
 const commands = require('./commands');
@@ -21,16 +23,19 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
+client.on('messageReactionAdd', (messageReaction, user) => handler.handle(messageReaction, user))
+
 client.on('message', msg => {
-    if (msg.author.bot) return;
+    if (!msg.content.startsWith(config.prefix) || msg.author.bot) return;
     if (msg.content.startsWith(config.prefix)) {
-        if (msg.content === (config.prefix + 'ping')) {
+        const args = msg.content.slice(config.prefix.length).trim().split(/ +/);
+        const command = args.shift().toLowerCase();
+        if (command === 'ping') {
             commands.ping(msg);
-        } else if (msg.content.startsWith(config.prefix + 'help')) {
-            var helpcommand = msg.content.substring((config.prefix.length + 'help '.length))
-            commands.help(msg, helpcommand, client);
-        } else if (msg.content === (config.prefix + 'meme')) {
-            commands.meme(msg);
+        } else if (command === 'help') {
+            commands.help(msg, client, args);
+        } else if (command === 'meme') {
+            commands.meme(msg, client, handler, args);
         }
     }
 });
