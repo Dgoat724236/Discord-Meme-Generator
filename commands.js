@@ -3,10 +3,9 @@ const config = require('./config');
 const Canvas = require('canvas');
 var sizeOf = require('image-size');
 var fs = require('fs')
-const FileType = require('file-type');
-const request = require('request');
+const request = require("request")
 const RC = require('reaction-core')
-
+const { DownloaderHelper } = require('node-downloader-helper');
 
 module.exports = {
     ping: function (msg) {
@@ -104,63 +103,82 @@ module.exports = {
             )
             .setTimestamp()
             .setFooter('If I break, please make an issue on the GitHub!');
+        const loadingEmbed = new Discord.MessageEmbed()
+            .setColor('#13613A')
+            .setDescription("Loading...");
 
         //Variables
         var step1;
         var step2;
         var step3;
-        var step4 = [];
+        var step4;
+
+        var botMessage;
 
         //Functions
 
         async function getImageEmbed(message) {
+
+            var botMessage;
+
             let filter = m => message.author.id === m.author.id;
-            message.channel.send(imageEmbed).then(() => {
+            message.channel.send(imageEmbed).then(m => {
+                botMessage = m;
                 message.channel.awaitMessages(filter, {
                     time: 60000,
                     max: 1,
                     errors: ['time']
                 })
                     .then(messages => {
-                        message = messages.first()
-                        if (message.attachments.size > 0) {
-                            message.attachments.forEach(Attachment => {
+                        newMessage = messages.first()
+                        if (newMessage.attachments.size > 0) {
+                            newMessage.attachments.forEach(Attachment => {
                                 step1 = Attachment.url;
-                                message.channel.send(`Input '${step1}' received ${messages.first().author}!`);
+                                console.log(step1);
+                                botMessage.delete();
+                                newMessage.delete();
                                 getTextEmbed(message);
-                                return;
                             })
                         } else {
-                            step1 = message.content;
-                            message.channel.send(`Input '${step1}' received ${messages.first().author}!`);
+                            step1 = newMessage.content;
+                            console.log(step1);
+                            botMessage.delete();
+                            newMessage.delete();
                             getTextEmbed(message);
-                            return;
                         }
                     })
                     .catch(() => {
+                        botMessage.delete();
                         message.channel.send(`No input received.`);
                     });
             });
         }
 
         async function getTextEmbed(message) {
+
+            var botMessage;
+
             let filter = m => message.author.id === m.author.id;
-            message.channel.send(textEmbed).then(() => {
+            message.channel.send(textEmbed).then(m => {
+                botMessage = m;
                 message.channel.awaitMessages(filter, {
                     time: 60000,
                     max: 1,
                     errors: ['time']
                 })
                     .then(messages => {
-                        message = messages.first()
-                        if (message.content.length > 0) {
-                            step2 = message.content;
-                            message.channel.send(`Input '${step2}' received ${messages.first().author}!`);
+                        newMessage = messages.first()
+                        if (newMessage.content.length > 0) {
+                            step2 = newMessage.content;
+                            console.log(step2);
+                            botMessage.delete();
+                            newMessage.delete();
                             getTextPosEmbed(message, handler);
                             return;
                         }
                     })
                     .catch(() => {
+                        botMessage.delete();
                         message.channel.send(`No input received.`);
                     });
             });
@@ -168,76 +186,87 @@ module.exports = {
 
         async function getTextPosEmbed(message, handler) {
 
+            var botMessage;
+
             const buttons = [
                 {
                     emoji: '↖',
                     run: () => {
-                        let step3 = 'topleft';
-                        message.channel.send(`Input '${step3}' received ${message.author}!`)
+                        step3 = 'topleft';
+                        console.log(step3);
+                        botMessage.delete();
                         getEffectEmbed(message, handler)
                     }
                 },
                 {
                     emoji: '⬆',
                     run: () => {
-                        let step3 = 'top';
-                        message.channel.send(`Input '${step3}' received ${message.author}!`)
+                        step3 = 'top';
+                        console.log(step3);
+                        botMessage.delete();
                         getEffectEmbed(message, handler)
                     }
                 },
                 {
                     emoji: '↗️',
                     run: () => {
-                        let step3 = 'topright';
-                        message.channel.send(`Input '${step3}' received ${message.author}!`)
+                        step3 = 'topright';
+                        console.log(step3);
+                        botMessage.delete();
                         getEffectEmbed(message, handler)
                     }
                 },
                 {
                     emoji: '⬅',
                     run: () => {
-                        let step3 = 'left';
-                        message.channel.send(`Input '${step3}' received ${message.author}!`)
+                        step3 = 'left';
+                        console.log(step3);
+                        botMessage.delete();
                         getEffectEmbed(message, handler)
                     }
                 },
                 {
                     emoji: '⏺',
                     run: () => {
-                        let step3 = 'center';
-                        message.channel.send(`Input '${step3}' received ${message.author}!`)
+                        step3 = 'center';
+                        console.log(step3);
+                        botMessage.delete();
                         getEffectEmbed(message, handler)
                     }
                 },
                 {
                     emoji: '➡',
                     run: () => {
-                        let step3 = 'right';
-                        message.channel.send(`Input '${step3}' received ${message.author}!`)
+                        step3 = 'right';
+                        console.log(step3);
+                        botMessage.delete();
                         getEffectEmbed(message, handler)
                     }
                 },
                 {
                     emoji: '↙️',
                     run: () => {
-                        let step3 = 'bottomleft';
-                        message.channel.send(`Input '${step3}' received ${message.author}!`)
+                        step3 = 'bottomleft';
+                        console.log(step3);
+                        botMessage.delete();
                         getEffectEmbed(message, handler)
                     }
                 },
                 {
                     emoji: '⬇️',
                     run: () => {
-                        let step3 = 'bottom';
-                        message.channel.send(`Input '${step3}' received ${message.author}!`)
+                        step3 = 'bottom';
+                        console.log(step3);
+                        botMessage.delete();
                         getEffectEmbed(message, handler)
                     }
                 },
                 {
                     emoji: '↘️',
                     run: () => {
-                        let step3 = 'bottomright';
-                        message.channel.send(`Input '${step3}' received ${message.author}!`)
+                        step3 = 'bottomright';
+                        console.log(step3);
+                        botMessage.delete();
                         getEffectEmbed(message, handler)
                     }
                 }
@@ -246,6 +275,7 @@ module.exports = {
             let getTextPosMenu = new RC.Menu(textPosEmbed, buttons, { owner: message.author.id });
             handler.addMenus(getTextPosMenu);
             message.channel.send(typeof getTextPosMenu.text === 'string' ? getTextPosMenu.text : { embed: getTextPosMenu.text }).then(async m => {
+                botMessage = m;
                 for (let button in getTextPosMenu.buttons) {
                     await m.react(button).catch(console.error)
                 }
@@ -255,28 +285,33 @@ module.exports = {
 
         async function getEffectEmbed(message, handler) {
 
+            var botMessage;
+
             const buttons = [
                 {
                     emoji: '❌',
                     run: () => {
-                        let step4 = 'none';
-                        message.channel.send(`Input '${step4}' received ${message.author}!`);
+                        step4 = 'none';
+                        console.log(step4);
+                        botMessage.delete();
                         compileImage(message)
                     }
                 },
                 {
                     emoji: '✨',
                     run: () => {
-                        let step4 = 'sparkle';
-                        message.channel.send(`Input '${step4}' received ${message.author}!`);
+                        step4 = 'sparkle';
+                        console.log(step4);
+                        botMessage.delete();
                         compileImage(message)
                     }
                 },
                 {
                     emoji: '🔲',
                     run: () => {
-                        let step4 = 'blackandwhite';
-                        message.channel.send(`Input '${step4}' received ${message.author}!`);
+                        step4 = 'blackandwhite';
+                        console.log(step4);
+                        botMessage.delete();
                         compileImage(message)
                     }
                 }
@@ -285,6 +320,7 @@ module.exports = {
             let getEmbed = new RC.Menu(effectEmbed, buttons, { owner: message.author.id });
             handler.addMenus(getEmbed);
             message.channel.send(typeof getEmbed.text === 'string' ? getEmbed.text : { embed: getEmbed.text }).then(async m => {
+                botMessage = m;
                 for (let button in getEmbed.buttons) {
                     await m.react(button).catch(console.error)
                 }
@@ -294,38 +330,33 @@ module.exports = {
 
         async function compileImage(message) {
 
-            console.log(step1);
+            var botMessage;
 
-            const download = (url, path, callback) => {
-                request.head(url, (err, res, body) => {
-                    request(url)
-                        .pipe(fs.createWriteStream(path))
-                        .on('close', callback)
-                })
-            }
-
-            const url = step1;
-            const id = Math.floor(1000 + Math.random() * 9000);
-            const path = './images/image' + String(id);
+            message.channel.send(loadingEmbed).then(m => {
+                botMessage = m;
+            });
 
             function get_url_extension(url) {
                 return url.split(/[#?]/)[0].split('.').pop().trim();
             }
 
-            fs.writeFile(path, '', (err) => {
-                if (err) throw err;
-                console.log('The file has been saved!');
-                download(url, path, () => {
-                    console.log('Done downloading!');
-                    fs.rename(path, path + '.' + get_url_extension(url), (err) => {
-                        if (err) throw err;
-                        console.log('The file has been renamed!');
-                        step1 = path + '.' + get_url_extension(url);
-                        console.log(step1);
-                        drawImage(message);                 
-                    });
-                });
-            });            
+            const url = step1;
+            const id = Math.floor(1000 + Math.random() * 9000);
+            const path = "./images/";
+
+            const options = {
+                fileName: 'image' + id + '.' + get_url_extension(url)
+            };
+
+            const dl = new DownloaderHelper(step1, path, options);
+
+            dl.on('end', () => {
+                step1 = "./images/" + String(id) + '.' + get_url_extension(url);
+                console.log(step1);
+                drawImage(message);
+            });
+
+            await dl.start().catch(err => { console.error(err) });
 
             async function drawImage (message) {
                 var dimensions = sizeOf(step1);
@@ -336,12 +367,13 @@ module.exports = {
                 const background = await Canvas.loadImage(step1);
                 ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
+                botMessage.delete();
+
                 const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'finished' + id + '.' + get_url_extension(url));
                 message.channel.send(attachment);
 
                 try {
                     fs.unlinkSync(step1)
-                    //file removed
                 } catch (err) {
                     console.error(err)
                 }
