@@ -5,7 +5,6 @@ var sizeOf = require('image-size');
 var fs = require('fs')
 const request = require("request")
 const RC = require('reaction-core')
-const { DownloaderHelper } = require('node-downloader-helper');
 
 module.exports = {
     ping: function (msg) {
@@ -114,6 +113,7 @@ module.exports = {
         var step4;
 
         var botMessage;
+        var imageMessage
 
         //Functions
 
@@ -130,20 +130,20 @@ module.exports = {
                     errors: ['time']
                 })
                     .then(messages => {
-                        newMessage = messages.first()
-                        if (newMessage.attachments.size > 0) {
-                            newMessage.attachments.forEach(Attachment => {
+                        imageMessage = messages.first()
+                        if (imageMessage.attachments.size > 0) {
+                            imageMessage.attachments.forEach(Attachment => {
                                 step1 = Attachment.url;
                                 console.log(step1);
                                 botMessage.delete();
-                                newMessage.delete();
+                                // newMessage.delete();
                                 getTextEmbed(message);
                             })
                         } else {
-                            step1 = newMessage.content;
+                            step1 = imageMessage.content;
                             console.log(step1);
                             botMessage.delete();
-                            newMessage.delete();
+                            // newMessage.delete();
                             getTextEmbed(message);
                         }
                     })
@@ -343,20 +343,22 @@ module.exports = {
             const url = step1;
             const id = Math.floor(1000 + Math.random() * 9000);
             const path = "./images/";
+            const filename = 'image' + id + '.' + get_url_extension(url);
 
-            const options = {
-                fileName: 'image' + id + '.' + get_url_extension(url)
-            };
+            const download = (url, path, callback) => {
+                request.head(url, (err, res, body) => {
+                    request(url)
+                        .pipe(fs.createWriteStream(path))
+                        .on('close', callback)
+                })
+            }
 
-            const dl = new DownloaderHelper(step1, path, options);
-
-            dl.on('end', () => {
-                step1 = "./images/" + String(id) + '.' + get_url_extension(url);
+            download(url, path + filename, () => {
+                console.log('✅ Done!')
+                step1 = path + filename;
                 console.log(step1);
                 drawImage(message);
-            });
-
-            await dl.start().catch(err => { console.error(err) });
+            })
 
             async function drawImage (message) {
                 var dimensions = sizeOf(step1);
@@ -367,6 +369,7 @@ module.exports = {
                 const background = await Canvas.loadImage(step1);
                 ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
+                imageMessage.delete();
                 botMessage.delete();
 
                 const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'finished' + id + '.' + get_url_extension(url));
